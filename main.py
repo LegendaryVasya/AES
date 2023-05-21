@@ -1,5 +1,25 @@
 import numpy as np
 
+plaintext = [0x32,0x88,0x31,0xE0,0x43,0x5A,0x31,0x37,0xF6,0x30,0x98,0x07,0xA8,0x8D,0xA2,0x34]
+print(f"Plaintext:\n{plaintext}\n")
+
+master_key = np.array([
+    [0x2B, 0x28, 0xAB, 0x09],
+    [0x7E, 0xAE, 0xF7, 0xCF],
+    [0x15, 0xD2, 0x15, 0x4F],
+    [0x16, 0xA6, 0x88, 0x3C]
+], dtype=np.uint8)
+
+
+def generate_state_matrix(block):
+    state_matrix = [[0] * 4 for _ in range(4)]
+
+    for col in range(4):
+        for row in range(4):
+            state_matrix[row][col] = block[col * 4 + row]
+
+    return state_matrix
+
 # AES S-Box Lookup Table
 S_BOX = np.array([
     0x63, 0x7C, 0x77, 0x7B, 0xF2, 0x6B, 0x6F, 0xC5, 0x30, 0x01, 0x67, 0x2B, 0xFE, 0xD7, 0xAB, 0x76,
@@ -88,8 +108,9 @@ def generate_round_keys(master_key):
 
 
 def aes_encrypt(plaintext, master_key):
-    state = np.array(plaintext, dtype=np.uint8).reshape(4, 4)
 
+    state = np.array(generate_state_matrix(plaintext), dtype=np.uint8).reshape(4, 4)
+    print(f"State:\n{state}\n")
     round_keys = generate_round_keys(master_key)
 
     state = add_round_key(state, round_keys[0])
@@ -107,24 +128,8 @@ def aes_encrypt(plaintext, master_key):
     return state
 
 
-# Test the encryption algorithm
-
-master_key = np.array([
-    [0x2B, 0x28, 0xAB, 0x09],
-    [0x7E, 0xAE, 0xF7, 0xCF],
-    [0x15, 0xD2, 0x15, 0x4F],
-    [0x16, 0xA6, 0x88, 0x3C]
-], dtype=np.uint8)
-
-plaintext = np.array([
-    [0x32, 0x88, 0x31, 0xE0],
-    [0x43, 0x5A, 0x31, 0x37],
-    [0xF6, 0x30, 0x98, 0x07],
-    [0xA8, 0x8D, 0xA2, 0x34]
-], dtype=np.uint8)
-
 ciphertext = aes_encrypt(plaintext, master_key)
 
-print(f"Plaintext:\n{plaintext}\n")
+
 print(f"Ciphertext:\n{ciphertext}")
 
