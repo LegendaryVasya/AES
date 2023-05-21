@@ -97,7 +97,7 @@ def generate_round_keys(master_key):
     round_key = np.copy(master_key)
     round_keys.append(round_key)
 
-    for i in range(3):
+    for i in range(10):
         round_key = np.roll(round_key, -1, axis=0)
         round_key = sub_bytes(round_key)
         round_key = mix_columns(round_key)
@@ -115,7 +115,7 @@ def aes_encrypt(plaintext, master_key):
 
     state = add_round_key(state, round_keys[0])
 
-    for i in range(3):
+    for i in range(1, 10):
         state = sub_bytes(state)
         state = shift_rows(state)
         state = mix_columns(state)
@@ -123,7 +123,7 @@ def aes_encrypt(plaintext, master_key):
 
     state = sub_bytes(state)
     state = shift_rows(state)
-    state = add_round_key(state, round_keys[3])
+    state = add_round_key(state, round_keys[10])
 
     return state
 
